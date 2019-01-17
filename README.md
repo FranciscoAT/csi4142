@@ -1,10 +1,23 @@
 # CSI4142 Intro. To Data Science
 
-Winter 2019
+--------
+
+## Table of Contents
+
+1. [Members](#group-members)
+1. [Dates](#important-dates)
 
 ---------
 
-Important Dates:
+## Group Members
+
+- Francisco Trindade 7791605
+- Mac Hayter 8256068
+- Reyna Doerwald 8216389
+
+---------
+
+## Important Dates
 
 - Feb 5: Conceptual Design
 - March 1: Midterm
