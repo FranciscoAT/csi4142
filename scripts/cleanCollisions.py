@@ -44,11 +44,15 @@ def clean_collision(reader):
         'SURFACE_CONDITION',
         'TRAFFIC_CONTROL',
         'LIGHT',
-        'IMPACT_TYPE'
+        'IMPACT_TYPE',
+        'DATE',
+        'COLLISION_CLASSIFICATION',
+        'LOCATION'
     ]
 
     clean_rows = []
     garbage_rows = []
+    index = len(list(csv.DictReader(open(ACCIDENT_FILE))))
     print("Initial Row Cleaning...")
     for row in reader:
         new_row, rejected = check_row(row, reqd_headers)
@@ -56,11 +60,39 @@ def clean_collision(reader):
             garbage_rows.append(new_row)
         else:
             clean_rows.append(new_row)
+
     print(f'Rejected {len(garbage_rows)} rows in initial collision check')
     append_to(GARBAGE_FILE_COLL, garbage_rows)
+    
 
-    print('Cleaning accident dim...')
-    clean_accident_dim(clean_rows)
+    clean_rows, garbage_rows = collision_deep_clean(clean_rows)
+
+def collision_deep_clean(rows):
+    clean_rows = []
+    rejected_rows = []
+
+    coll_class = 'COLLISION_CLASSIFICATION'
+
+    for row in clean_rows:
+        is_clean = True
+        new_row = row
+
+        # Check fatalities
+        fatal_text = new_row[coll_class]
+        if ' fatal injury' in fatal_text:
+            new_row['fatal'] = 1
+        else:
+            new_row['fatal'] = 0
+        new_row.pop(coll_class, None)
+        
+        if is_clean:
+            clean_rows.append(new_row)
+        else:
+            rejected_rows.append(new_row)
+        
+
+    return clean_rows, rejected_rows
+        
 
 
 def clean_accident_dim(rows):
