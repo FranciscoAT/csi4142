@@ -1,0 +1,37 @@
+{'TIME': '7:00:00 PM', 'ENVIRONMENT': '02 - Rain', 'SURFACE_CONDITION': '04 - Slush', 'TRAFFIC_CONTROL': '', 'LIGHT': '07 - Dark', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '3:38:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '02 - Wet', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '6:15:00 AM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '03 - Dawn', 'IMPACT_TYPE': '05 - Turning movement'}
+{'TIME': '12:00:00 AM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '04 - Slush', 'TRAFFIC_CONTROL': '', 'LIGHT': '00 - Unknown', 'IMPACT_TYPE': '07 - SMV other'}
+{'TIME': '11:50:00 PM', 'ENVIRONMENT': '03 - Snow', 'SURFACE_CONDITION': '03 - Loose snow', 'TRAFFIC_CONTROL': '', 'LIGHT': '07 - Dark', 'IMPACT_TYPE': '03 - Rear end'}
+{'TIME': '10:05:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '07 - Dark', 'IMPACT_TYPE': '07 - SMV other'}
+{'TIME': '5:31:00 PM', 'ENVIRONMENT': '02 - Rain', 'SURFACE_CONDITION': '02 - Wet', 'TRAFFIC_CONTROL': '', 'LIGHT': '05 - Dusk', 'IMPACT_TYPE': '05 - Turning movement'}
+{'TIME': '5:51:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '02 - Wet', 'TRAFFIC_CONTROL': '', 'LIGHT': '07 - Dark', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '6:35:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '07 - Dark', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '12:00:00 PM', 'ENVIRONMENT': '02 - Rain', 'SURFACE_CONDITION': '02 - Wet', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '12:20:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '6:49:00 AM', 'ENVIRONMENT': '02 - Rain', 'SURFACE_CONDITION': '02 - Wet', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '5:15:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '3:37:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '08 - Loose sand or gravel', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '99 - Other'}
+{'TIME': '10:08:00 AM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '02 - Wet', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '4:10:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '02 - Wet', 'TRAFFIC_CONTROL': '', 'LIGHT': '05 - Dusk', 'IMPACT_TYPE': '03 - Rear end'}
+{'TIME': '8:15:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '07 - Dark', 'IMPACT_TYPE': '05 - Turning movement'}
+{'TIME': '2:37:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '03 - Rear end'}
+{'TIME': '9:28:00 AM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '1:32:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '8:23:00 AM', 'ENVIRONMENT': '03 - Snow', 'SURFACE_CONDITION': '05 - Packed snow', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '07 - SMV other'}
+{'TIME': '4:21:00 PM', 'ENVIRONMENT': '03 - Snow', 'SURFACE_CONDITION': '03 - Loose snow', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '10:09:00 PM', 'ENVIRONMENT': '03 - Snow', 'SURFACE_CONDITION': '03 - Loose snow', 'TRAFFIC_CONTROL': '', 'LIGHT': '07 - Dark', 'IMPACT_TYPE': '07 - SMV other'}
+{'TIME': '4:37:00 PM', 'ENVIRONMENT': '02 - Rain', 'SURFACE_CONDITION': '02 - Wet', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '7:43:00 AM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '01 - Approaching'}
+{'TIME': '12:11:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '07 - SMV other'}
+{'TIME': '12:00:00 AM', 'ENVIRONMENT': '', 'SURFACE_CONDITION': '00 - Unknown', 'TRAFFIC_CONTROL': '10 - No control', 'LIGHT': '00 - Unknown', 'IMPACT_TYPE': '06 - SMV unattended vehicle'}
+{'TIME': '12:28:00 PM', 'ENVIRONMENT': '02 - Rain', 'SURFACE_CONDITION': '02 - Wet', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '03 - Rear end'}
+{'TIME': '5:20:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '07 - Dark', 'IMPACT_TYPE': '03 - Rear end'}
+{'TIME': '8:53:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '07 - Dark', 'IMPACT_TYPE': '07 - SMV other'}
+{'TIME': '7:42:00 AM', 'ENVIRONMENT': '04 - Freezing Rain', 'SURFACE_CONDITION': '06 - Ice', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '06 - SMV unattended vehicle'}
+{'TIME': '7:33:00 AM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '02 - Wet', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '7:31:00 AM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '06 - Ice', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '7:28:00 PM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '02 - Angle'}
+{'TIME': '8:35:00 AM', 'ENVIRONMENT': '01 - Clear', 'SURFACE_CONDITION': '01 - Dry', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '03 - Rear end'}
+{'TIME': '1:14:00 PM', 'ENVIRONMENT': '02 - Rain', 'SURFACE_CONDITION': '02 - Wet', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '05 - Turning movement'}
+{'TIME': '11:41:00 AM', 'ENVIRONMENT': '03 - Snow', 'SURFACE_CONDITION': '05 - Packed snow', 'TRAFFIC_CONTROL': '', 'LIGHT': '01 - Daylight', 'IMPACT_TYPE': '03 - Rear end'}

@@ -8,9 +8,10 @@ import collections
 DATA_DIR = './data'
 SOURCE_DIR = f"{DATA_DIR}/source/collision"
 CLEAN_DIR = f"{DATA_DIR}/cleaned/accident-dim"
-GARBAGE_DIR = f"{DATA_DIR}/garbage/accident-dim"
+GARBAGE_DIR = f"{DATA_DIR}/garbage"
 ACCIDENT_FILE = f"{CLEAN_DIR}/accident-dim.txt"
-GARBAGE_FILE = f"{GARBAGE_DIR}/accident-dim.txt"
+GARBAGE_FILE_ACC = f"{GARBAGE_DIR}/accident-dim.txt"
+GARBAGE_FILE_COLL = f'{GARBAGE_DIR}/collision.txt'
 
 
 def main() -> None:
@@ -19,14 +20,12 @@ def main() -> None:
         print('Run this file from the root directory of the project.')
         return
 
-    csv_files = [f"{SOURCE_DIR}/{x}" for x in os.listdir(SOURCE_DIR)]
-    # Order is important
-    csv_files.sort()
-    print(csv_files)
+    csv_files = sorted([f"{SOURCE_DIR}/{x}" for x in os.listdir(SOURCE_DIR)])
 
     # Clean files
     open(ACCIDENT_FILE, 'w').close()
-    open(GARBAGE_FILE, 'w').close()
+    open(GARBAGE_FILE_ACC, 'w').close()
+    open(GARBAGE_FILE_COLL, 'w').close()
 
     for csv_file in csv_files:
         if '2017' in csv_file:
@@ -39,10 +38,32 @@ def main() -> None:
 
 
 def clean_collision(reader):
-    clean_accident_dim(reader)
+    reqd_headers = [
+        'TIME',
+        'ENVIRONMENT',
+        'SURFACE_CONDITION',
+        'TRAFFIC_CONTROL',
+        'LIGHT',
+        'IMPACT_TYPE'
+    ]
+
+    clean_rows = []
+    garbage_rows = []
+    print("Initial Row Cleaning...")
+    for row in reader:
+        new_row, rejected = check_row(row, reqd_headers)
+        if rejected:
+            garbage_rows.append(new_row)
+        else:
+            clean_rows.append(new_row)
+    print(f'Rejected {len(garbage_rows)} rows in initial collision check')
+    append_to(GARBAGE_FILE_COLL, garbage_rows)
+
+    print('Cleaning accident dim...')
+    clean_accident_dim(clean_rows)
 
 
-def clean_accident_dim(reader):
+def clean_accident_dim(rows):
     # Headers
     time = 'TIME'
     environment = 'ENVIRONMENT'
@@ -51,13 +72,13 @@ def clean_accident_dim(reader):
     visibility = 'LIGHT'
     impact = 'IMPACT_TYPE'
 
-    reqd_headers = [
-        time,
-        environment,
-        condition,
-        control,
-        visibility,
-        impact
+    wanted_headers = [
+        'TIME',
+        'ENVIRONMENT',
+        'SURFACE_CONDITION',
+        'TRAFFIC_CONTROL',
+        'LIGHT',
+        'IMPACT_TYPE'
     ]
 
     index = len(list(csv.DictReader(open(ACCIDENT_FILE))))
@@ -65,20 +86,17 @@ def clean_accident_dim(reader):
     parsed_rows = []
     rejected_rows = []
     environment_types = set()
-    for row in reader:
-        new_row, rejected = check_row(row, reqd_headers)
+    for row in rows:
+        new_row, _ = check_row(row, wanted_headers)
         new_row["id"] = index
         index += 1
         environment_types.add(new_row[environment])
+        parsed_rows.append(new_row)
 
-        if rejected:
-            rejected_rows.append(new_row)
-        else:
-            parsed_rows.append(new_row)
-
+    print(f'Rejected {len(rejected_rows)} in accident dimension')
     append_to(ACCIDENT_FILE, parsed_rows)
-    append_to(GARBAGE_FILE, rejected_rows)
-    print(environment_types)
+    append_to(GARBAGE_FILE_ACC, rejected_rows)
+    # print(environment_types)
 
 
 def check_row(row, headers):
@@ -89,13 +107,14 @@ def check_row(row, headers):
             rejected = True
         new_row[header] = row[header]
     return new_row, rejected
-    
+
 
 def compress_row(row):
     compressed_row = []
     for _, val in row.items():
         compressed_row.append(val)
     return ','.join(compressed_row)
+
 
 def append_to(filename, rows):
     with open(filename, 'a') as app_file:
