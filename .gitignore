@@ -1,2 +1,3 @@
 .vscode
 data/source/weather/*
+**/creds.json
