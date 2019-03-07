@@ -3,6 +3,7 @@ import csv
 import sys
 import os
 import collections
+import datetime
 
 # Constants
 DATA_DIR = './data'
@@ -20,138 +21,106 @@ def main() -> None:
         print('Run this file from the root directory of the project.')
         return
 
-    csv_files = sorted([f"{SOURCE_DIR}/{x}" for x in os.listdir(SOURCE_DIR)])
+    csv_files = sorted(os.listdir(SOURCE_DIR))
 
-    # Clean files
-    open(ACCIDENT_FILE, 'w').close()
-    open(GARBAGE_FILE_ACC, 'w').close()
-    open(GARBAGE_FILE_COLL, 'w').close()
-
+    accident_index = 0
+    location_index = 0
+    locations = {}
     for csv_file in csv_files:
         if '2017' in csv_file:
             print(f"Ignoring {csv_file}")
             continue
 
         print(f"Cleaning {csv_file}...")
-        reader = csv.DictReader(open(csv_file))
-        clean_collision(reader)
+        accident_index, location_index, locations = clean_file(csv_file, accident_index, location_index, locations)
 
 
-def clean_collision(reader):
-    reqd_headers = [
-        'TIME',
-        'ENVIRONMENT',
-        'SURFACE_CONDITION',
-        'TRAFFIC_CONTROL',
-        'LIGHT',
-        'IMPACT_TYPE',
-        'DATE',
-        'COLLISION_CLASSIFICATION',
-        'LOCATION'
+def clean_file(filename, accident_index, location_index, locations):
+    field_names = [
+        "ACCIDENT_ID",
+        "LOCATION",
+        "LONGITUDE",
+        "LATITUDE",
+        "DATE",
+        "TIME",
+        "LOCATION_ID"
     ]
 
-    clean_rows = []
-    garbage_rows = []
-    index = len(list(csv.DictReader(open(ACCIDENT_FILE))))
-    print("Initial Row Cleaning...")
+    reader = csv.DictReader(open(f"{SOURCE_DIR}/{filename}"))
+    writer = csv.DictWriter(open(f"{CLEAN_DIR}/{filename}", 'w'), fieldnames=field_names)
+    writer.writeheader()
+
     for row in reader:
-        new_row, rejected = check_row(row, reqd_headers)
-        if rejected:
-            garbage_rows.append(new_row)
+        # Accident ID
+        new_row = get_elements(row)
+        new_row["ACCIDENT_ID"] = accident_index
+        accident_index += 1
+
+        # Location ID
+        new_location = f"{new_row['LONGITUDE']}-{new_row['LATITUDE']}"
+        if new_location not in locations:
+            locations[new_location] = location_index
+            new_row["LOCATION_ID"] = location_index
+            location_index += 1
         else:
-            clean_rows.append(new_row)
+            new_row["LOCATION_ID"] = locations[new_location]
 
-    print(f'Rejected {len(garbage_rows)} rows in initial collision check')
-    append_to(GARBAGE_FILE_COLL, garbage_rows)
-    
+        # Clean Time
+        new_row["TIME"], next_day = parse_time(new_row["TIME"])
 
-    clean_rows, garbage_rows = collision_deep_clean(clean_rows)
+        if next_day:
+            new_date = datetime.datetime.strptime(new_row["DATE"], "%Y-%m-%d")
+            new_date = new_date + datetime.timedelta(days=1)
+            new_row["DATE"] = new_date.strftime("%Y-%m-%d")
 
-def collision_deep_clean(rows):
-    clean_rows = []
-    rejected_rows = []
+        # Write row to file
+        writer.writerow(new_row)
 
-    coll_class = 'COLLISION_CLASSIFICATION'
+    return accident_index, location_index, locations
 
-    for row in clean_rows:
-        is_clean = True
-        new_row = row
+def parse_time(time_in):
+    if len(time_in.split(':')[0]) == 1:
+        time_in = f"0{time_in}"
 
-        # Check fatalities
-        fatal_text = new_row[coll_class]
-        if ' fatal injury' in fatal_text:
-            new_row['fatal'] = 1
-        else:
-            new_row['fatal'] = 0
-        new_row.pop(coll_class, None)
-        
-        if is_clean:
-            clean_rows.append(new_row)
-        else:
-            rejected_rows.append(new_row)
-        
+    new_time = convert24(time_in)
 
-    return clean_rows, rejected_rows
-        
+    hours, minutes, _ = [int(x) for x in new_time.split(':')]
+
+    if minutes >= 30:
+        hours += 1
+
+    if hours == 24:
+        return "00:00", True
+    elif hours < 10:
+        return f"0{hours}:00", False
+    else:
+        return f"{hours}:00", False
+
+def convert24(time_in):
+    if time_in[-2:] == "AM" and time_in[:2] == "12":
+        return "00" + time_in[2:-2]
+    elif time_in[-2:] == "AM":
+        return time_in[:-2]
+    elif time_in[-2:] == "PM" and time_in[:2] == "12":
+        return time_in[:-2]
+    else:
+        return str(int(time_in[:2]) + 12) + time_in[2:8]
 
 
-def clean_accident_dim(rows):
-    # Headers
-    time = 'TIME'
-    environment = 'ENVIRONMENT'
-    condition = 'SURFACE_CONDITION'
-    control = 'TRAFFIC_CONTROL'
-    visibility = 'LIGHT'
-    impact = 'IMPACT_TYPE'
-
-    wanted_headers = [
-        'TIME',
-        'ENVIRONMENT',
-        'SURFACE_CONDITION',
-        'TRAFFIC_CONTROL',
-        'LIGHT',
-        'IMPACT_TYPE'
+def get_elements(row):
+    elements = [
+        "LOCATION",
+        "LONGITUDE",
+        "LATITUDE",
+        "DATE",
+        "TIME"
     ]
 
-    index = len(list(csv.DictReader(open(ACCIDENT_FILE))))
-
-    parsed_rows = []
-    rejected_rows = []
-    environment_types = set()
-    for row in rows:
-        new_row, _ = check_row(row, wanted_headers)
-        new_row["id"] = index
-        index += 1
-        environment_types.add(new_row[environment])
-        parsed_rows.append(new_row)
-
-    print(f'Rejected {len(rejected_rows)} in accident dimension')
-    append_to(ACCIDENT_FILE, parsed_rows)
-    append_to(GARBAGE_FILE_ACC, rejected_rows)
-    # print(environment_types)
-
-
-def check_row(row, headers):
     new_row = {}
-    rejected = False
-    for header in headers:
-        if row[header] == '':
-            rejected = True
-        new_row[header] = row[header]
-    return new_row, rejected
+    for key in elements:
+        new_row[key] = row[key]
 
-
-def compress_row(row):
-    compressed_row = []
-    for _, val in row.items():
-        compressed_row.append(val)
-    return ','.join(compressed_row)
-
-
-def append_to(filename, rows):
-    with open(filename, 'a') as app_file:
-        for row in rows:
-            app_file.write(f"{str(row)}\n")
+    return new_row
 
 
 if __name__ == "__main__":
