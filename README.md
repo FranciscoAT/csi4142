@@ -38,6 +38,9 @@ data
         \ --- neighborhood
               \ --- *put neighborhood_list.txt here*
         \ --- stations
+              \ --- *put Station Inventory EN.csv here and remove the rows above the header*
+        \ --- weather
+              \ --- *put weather files from class drive here*
   \ --- cleaned
         \ --- accident-dim
               \ --- *collision data inserter here after running scripts/cleanCollisions.py*
