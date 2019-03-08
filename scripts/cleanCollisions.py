@@ -4,11 +4,14 @@ import sys
 import os
 import collections
 import datetime
+import json
+import math
 
 # Constants
 DATA_DIR = './data'
 SOURCE_DIR = f"{DATA_DIR}/source/collision"
 CLEAN_DIR = f"{DATA_DIR}/cleaned/accident-dim"
+NEIGHBORHOODS = f"{DATA_DIR}/cleaned/neighborhood/neighborhood_list.json"
 
 
 def main() -> None:
@@ -17,11 +20,15 @@ def main() -> None:
         print('Run this file from the root directory of the project.')
         return
 
+    print("Please ensure you have run scripts/generateNeighborhoods.py before running this else it will fail!")
+
     clean_ottawa_collisions()
 
 
 def clean_ottawa_collisions():
     print("Cleaning Ottawa Collisions")
+    hood_json = json.load(open(NEIGHBORHOODS, 'r'))
+
     csv_files_raw = os.listdir(SOURCE_DIR)
     csv_files = []
     for file in csv_files_raw:
@@ -39,10 +46,11 @@ def clean_ottawa_collisions():
             is_2017 = True
 
         print(f"Cleaning {csv_file}...")
-        accident_index, location_index, locations = clean_file(csv_file, accident_index, location_index, locations, is_2017)
+        accident_index, location_index, locations = clean_file(
+            csv_file, accident_index, location_index, locations, is_2017, hood_json)
 
 
-def clean_file(filename, accident_index, location_index, locations, is_2017):
+def clean_file(filename, accident_index, location_index, locations, is_2017, hood_json):
     core_field_names = [
         "LOCATION",
         "LONGITUDE",
@@ -74,7 +82,8 @@ def clean_file(filename, accident_index, location_index, locations, is_2017):
         "IS_INTERSECTION",
         "ROAD_HIGHWAY",
         "INTERSECTION_RAMP_1",
-        "INTERSECTION_RAMP_2"
+        "INTERSECTION_RAMP_2",
+        "NEIGHBORHOOD"
     ]
 
     reader = csv.DictReader(open(f"{SOURCE_DIR}/{filename}"))
@@ -87,7 +96,7 @@ def clean_file(filename, accident_index, location_index, locations, is_2017):
         new_row["ACCIDENT_KEY"] = accident_index
         accident_index += 1
 
-        # Rename Keys   
+        # Rename Keys
         new_row["ACCIDENT_TIME"] = new_row.pop("TIME")
         new_row["ROAD_SURFACE"] = new_row.pop("SURFACE_CONDITION")
         new_row["VISIBILITY"] = new_row.pop("LIGHT")
@@ -119,6 +128,9 @@ def clean_file(filename, accident_index, location_index, locations, is_2017):
         # Clean up location
         # parse_location(new_row["LOCATION"])
 
+        # Get Neighborhood
+        new_row["NEIGHBORHOOD"] = getNeighborhood(new_row["LATITUDE"], new_row["LONGITUDE"], hood_json)
+
         # Remove some keys
         new_row.pop("COLLISION_CLASSIFICATION")
 
@@ -126,6 +138,34 @@ def clean_file(filename, accident_index, location_index, locations, is_2017):
         writer.writerow(new_row)
 
     return accident_index, location_index, locations
+
+
+def getNeighborhood(lat, long, hood_json):
+    closest = ''
+    closest_val = 1000000
+
+    for key, value in hood_json.items():
+        dist = distance((float(lat), float(long)), (value['lat'], value['lng']))
+        if dist < closest_val:
+            closest_val = dist
+            closest = key
+    return closest
+
+
+def distance(x, y):
+    lat1, lon1 = x
+    lat2, lon2 = y
+    radius = 6371
+
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon2)
+    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
+        * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    d = radius * c
+
+    return d
+
 
 def parse_location(location):
     is_intersection = False
@@ -139,7 +179,7 @@ def parse_location(location):
         if '/' in location[0] and '/' in location[1]:
             print('@'.join(location))
 
-    
+
 def normalize_date(date, next_day, is_2017):
     if next_day == False and is_2017 == False:
         return date
@@ -147,13 +187,14 @@ def normalize_date(date, next_day, is_2017):
     in_format = "%Y-%m-%d"
     if is_2017:
         in_format = "%m/%d/%Y"
-    
+
     new_date = datetime.datetime.strptime(date, in_format)
-    
+
     if next_day:
-        new_date = new_date + datetime.timedelta(days = 1)
-    
+        new_date = new_date + datetime.timedelta(days=1)
+
     return new_date.strftime("%Y-%m-%d")
+
 
 def parse_time(time_in):
     if len(time_in.split(':')[0]) == 1:
@@ -173,6 +214,7 @@ def parse_time(time_in):
     else:
         return f"{hours}:00", False
 
+
 def convert24(time_in):
     if time_in[-2:] == "AM" and time_in[:2] == "12":
         return "00" + time_in[2:-2]
@@ -182,6 +224,7 @@ def convert24(time_in):
         return time_in[:-2]
     else:
         return str(int(time_in[:2]) + 12) + time_in[2:8]
+
 
 def parse_out_id(val_in):
     if val_in == '':
