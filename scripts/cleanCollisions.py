@@ -74,7 +74,6 @@ def clean_file(filename, accident_index, location_index, locations, is_2017, hoo
         "VISIBILITY",
         "IMPACT_TYPE",
         "LOCATION_KEY",
-        "LOCATION",
         "LONGITUDE",
         "LATITUDE",
         "DATE",
@@ -126,7 +125,13 @@ def clean_file(filename, accident_index, location_index, locations, is_2017, hoo
             new_row[key] = parse_out_id(new_row[key])
 
         # Clean up location
+        is_intersection, road_highway_name, intersection_ramp_1, intersection_ramp_2 = parse_location(new_row["LOCATION"])
         # parse_location(new_row["LOCATION"])
+        new_row["IS_INTERSECTION"] = is_intersection
+        new_row["ROAD_HIGHWAY"] = road_highway_name
+        new_row["INTERSECTION_RAMP_1"] = intersection_ramp_1
+        new_row["INTERSECTION_RAMP_2"] = intersection_ramp_2
+        new_row.pop("LOCATION")
 
         # Get Neighborhood
         new_row["NEIGHBORHOOD"] = getNeighborhood(new_row["LATITUDE"], new_row["LONGITUDE"], hood_json)
@@ -175,9 +180,30 @@ def parse_location(location):
 
     if '@' in location:
         is_intersection = True
-        location = location.split('@')
-        if '/' in location[0] and '/' in location[1]:
-            print('@'.join(location))
+        location = location.split(' @ ')
+        if len(location) != 2:
+            location = location[0][:-2].split('/')
+            road_highway_name = location[0]
+            intersection_ramp_1 = location[1]
+            intersection_ramp_2 = [3]
+        else:
+            road_highway_name = location[0]
+            intersection_ramp_1 = location[1]
+    elif 'btwn' in location:
+        location = location.split(' btwn ')
+        road_highway_name = location[0]
+        location = location[1].split(' & ')
+        intersection_ramp_1 = location[0]
+        if len(location) >= 2:
+            intersection_ramp_2 = location[1]
+    else:
+        location = location.split('/')
+        road_highway_name = location[0]
+        intersection_ramp_1 = location[1]
+        if len(location) == 3:
+            intersection_ramp_2 = location[2]
+
+    return is_intersection, road_highway_name, intersection_ramp_1, intersection_ramp_2
 
 
 def normalize_date(date, next_day, is_2017):
