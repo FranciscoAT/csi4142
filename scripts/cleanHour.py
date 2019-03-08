@@ -44,8 +44,6 @@ def allHours():
 			else:
 				new_row["HOLIDAY"]=False
 				new_row["HOLIDAY_NAME"]=''
-			
-			print(new_row)
 			writer.writerow(new_row)
 
 allHours()
