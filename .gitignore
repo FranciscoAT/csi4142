@@ -1,3 +1,4 @@
 .vscode
 **/creds.json
 data/*
+**/.DS_Store
