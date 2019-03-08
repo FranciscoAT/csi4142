@@ -27,3 +27,24 @@
 --------
 
 https://drive.google.com/open?id=1d7SsIr_iLYkrwJMSTDzIgIGY9LRiqtCK
+
+# data folder structure
+
+```
+data
+  \ --- source
+        \ --- collision
+              \ --- *unzip collisions.zip here*
+        \ --- neighborhood
+              \ --- *put neighborhood_list.txt here*
+        \ --- stations
+  \ --- cleaned
+        \ --- accident-dim
+              \ --- *collision data inserter here after running scripts/cleanCollisions.py*
+        \ --- neighborhood
+              \ --- *put neighborhood_list.json here*
+        \ --- stations
+        \ --- weather
+              \ --- ottawa
+              \ --- toronto
+```
