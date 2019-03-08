@@ -4,11 +4,15 @@ import sys
 import os
 import collections
 import datetime
+import json
+import math
 
 # Constants
 DATA_DIR = './data'
 SOURCE_DIR = f"{DATA_DIR}/source/collision"
 CLEAN_DIR = f"{DATA_DIR}/cleaned/accident-dim"
+NEIGHBORHOODS = f"{DATA_DIR}/cleaned/neighborhood/neighborhood_list.json"
+STATIONS = f"{DATA_DIR}/cleaned/stations/Ottawa_Stations.csv"
 
 
 def main() -> None:
@@ -17,11 +21,16 @@ def main() -> None:
         print('Run this file from the root directory of the project.')
         return
 
+    print("Please ensure you have run scripts/generateNeighborhoods.py before running this else it will fail!")
+
     clean_ottawa_collisions()
 
 
 def clean_ottawa_collisions():
     print("Cleaning Ottawa Collisions")
+    hood_json = json.load(open(NEIGHBORHOODS, 'r'))
+    stations_dict = get_stations()
+
     csv_files_raw = os.listdir(SOURCE_DIR)
     csv_files = []
     for file in csv_files_raw:
@@ -39,10 +48,11 @@ def clean_ottawa_collisions():
             is_2017 = True
 
         print(f"Cleaning {csv_file}...")
-        accident_index, location_index, locations = clean_file(csv_file, accident_index, location_index, locations, is_2017)
+        accident_index, location_index, locations = clean_file(
+            csv_file, accident_index, location_index, locations, is_2017, hood_json, stations_dict)
 
 
-def clean_file(filename, accident_index, location_index, locations, is_2017):
+def clean_file(filename, accident_index, location_index, locations, is_2017, hood_json, stations_dict):
     core_field_names = [
         "LOCATION",
         "LONGITUDE",
@@ -66,7 +76,6 @@ def clean_file(filename, accident_index, location_index, locations, is_2017):
         "VISIBILITY",
         "IMPACT_TYPE",
         "LOCATION_KEY",
-        "LOCATION",
         "LONGITUDE",
         "LATITUDE",
         "DATE",
@@ -74,7 +83,9 @@ def clean_file(filename, accident_index, location_index, locations, is_2017):
         "IS_INTERSECTION",
         "ROAD_HIGHWAY",
         "INTERSECTION_RAMP_1",
-        "INTERSECTION_RAMP_2"
+        "INTERSECTION_RAMP_2",
+        "NEIGHBORHOOD",
+        "CLOSEST_STATION"
     ]
 
     reader = csv.DictReader(open(f"{SOURCE_DIR}/{filename}"))
@@ -87,7 +98,7 @@ def clean_file(filename, accident_index, location_index, locations, is_2017):
         new_row["ACCIDENT_KEY"] = accident_index
         accident_index += 1
 
-        # Rename Keys   
+        # Rename Keys
         new_row["ACCIDENT_TIME"] = new_row.pop("TIME")
         new_row["ROAD_SURFACE"] = new_row.pop("SURFACE_CONDITION")
         new_row["VISIBILITY"] = new_row.pop("LIGHT")
@@ -117,7 +128,19 @@ def clean_file(filename, accident_index, location_index, locations, is_2017):
             new_row[key] = parse_out_id(new_row[key])
 
         # Clean up location
+        is_intersection, road_highway_name, intersection_ramp_1, intersection_ramp_2 = parse_location(new_row["LOCATION"])
         # parse_location(new_row["LOCATION"])
+        new_row["IS_INTERSECTION"] = is_intersection
+        new_row["ROAD_HIGHWAY"] = road_highway_name
+        new_row["INTERSECTION_RAMP_1"] = intersection_ramp_1
+        new_row["INTERSECTION_RAMP_2"] = intersection_ramp_2
+        new_row.pop("LOCATION")
+
+        # Get Neighborhood
+        new_row["NEIGHBORHOOD"] = get_closest(new_row["LATITUDE"], new_row["LONGITUDE"], hood_json)
+
+        # Closest Station
+        new_row["CLOSEST_STATION"] = get_closest(new_row["LATITUDE"], new_row["LONGITUDE"], stations_dict)
 
         # Remove some keys
         new_row.pop("COLLISION_CLASSIFICATION")
@@ -127,6 +150,34 @@ def clean_file(filename, accident_index, location_index, locations, is_2017):
 
     return accident_index, location_index, locations
 
+
+def get_closest(lat, long, dict_in):
+    closest = ''
+    closest_val = 1000000
+
+    for key, value in dict_in.items():
+        dist = distance((float(lat), float(long)), (value['lat'], value['lng']))
+        if dist < closest_val:
+            closest_val = dist
+            closest = key
+    return closest
+
+
+def distance(x, y):
+    lat1, lon1 = x
+    lat2, lon2 = y
+    radius = 6371
+
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon2)
+    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
+        * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    d = radius * c
+
+    return d
+
+
 def parse_location(location):
     is_intersection = False
     road_highway_name = ''
@@ -135,11 +186,32 @@ def parse_location(location):
 
     if '@' in location:
         is_intersection = True
-        location = location.split('@')
-        if '/' in location[0] and '/' in location[1]:
-            print('@'.join(location))
+        location = location.split(' @ ')
+        if len(location) != 2:
+            location = location[0][:-2].split('/')
+            road_highway_name = location[0]
+            intersection_ramp_1 = location[1]
+            intersection_ramp_2 = [3]
+        else:
+            road_highway_name = location[0]
+            intersection_ramp_1 = location[1]
+    elif 'btwn' in location:
+        location = location.split(' btwn ')
+        road_highway_name = location[0]
+        location = location[1].split(' & ')
+        intersection_ramp_1 = location[0]
+        if len(location) >= 2:
+            intersection_ramp_2 = location[1]
+    else:
+        location = location.split('/')
+        road_highway_name = location[0]
+        intersection_ramp_1 = location[1]
+        if len(location) == 3:
+            intersection_ramp_2 = location[2]
 
-    
+    return is_intersection, road_highway_name, intersection_ramp_1, intersection_ramp_2
+
+
 def normalize_date(date, next_day, is_2017):
     if next_day == False and is_2017 == False:
         return date
@@ -147,13 +219,14 @@ def normalize_date(date, next_day, is_2017):
     in_format = "%Y-%m-%d"
     if is_2017:
         in_format = "%m/%d/%Y"
-    
+
     new_date = datetime.datetime.strptime(date, in_format)
-    
+
     if next_day:
-        new_date = new_date + datetime.timedelta(days = 1)
-    
+        new_date = new_date + datetime.timedelta(days=1)
+
     return new_date.strftime("%Y-%m-%d")
+
 
 def parse_time(time_in):
     if len(time_in.split(':')[0]) == 1:
@@ -173,6 +246,7 @@ def parse_time(time_in):
     else:
         return f"{hours}:00", False
 
+
 def convert24(time_in):
     if time_in[-2:] == "AM" and time_in[:2] == "12":
         return "00" + time_in[2:-2]
@@ -182,6 +256,7 @@ def convert24(time_in):
         return time_in[:-2]
     else:
         return str(int(time_in[:2]) + 12) + time_in[2:8]
+
 
 def parse_out_id(val_in):
     if val_in == '':
@@ -196,6 +271,18 @@ def get_elements(row, field_names):
 
     return new_row
 
+
+def get_stations():
+    reader = csv.DictReader(open(STATIONS, 'r'))
+
+    station_dict = {}
+    for row in reader:
+        station_dict[row["Name"]] = {
+            'lat': float(row["Latitude (Decimal Degrees)"]),
+            'lng': float(row["Longitude (Decimal Degrees)"])
+        }
+
+    return station_dict
 
 if __name__ == "__main__":
     main()

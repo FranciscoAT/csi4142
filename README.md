@@ -7,7 +7,7 @@
 1. [Members](#group-members)
 1. [Dates](#important-dates)
 
----------
+--------
 
 ## Group Members
 
@@ -15,7 +15,7 @@
 - Mac Hayter 8256068
 - Reyna Doerwald 8216389
 
----------
+--------
 
 ## Important Dates
 
@@ -24,3 +24,30 @@
 - March 12: Physical Design
 - April 2: BI Dashboard
 
+--------
+
+https://drive.google.com/open?id=1d7SsIr_iLYkrwJMSTDzIgIGY9LRiqtCK
+
+# data folder structure
+
+```
+data
+  \ --- source
+        \ --- collision
+              \ --- *unzip collisions.zip here*
+        \ --- neighborhood
+              \ --- *put neighborhood_list.txt here*
+        \ --- stations
+              \ --- *put Station Inventory EN.csv here and remove the rows above the header*
+        \ --- weather
+              \ --- *put weather files from class drive here*
+  \ --- cleaned
+        \ --- accident-dim
+              \ --- *collision data inserter here after running scripts/cleanCollisions.py*
+        \ --- neighborhood
+              \ --- *put neighborhood_list.json here*
+        \ --- stations
+        \ --- weather
+              \ --- ottawa
+              \ --- toronto
+```
