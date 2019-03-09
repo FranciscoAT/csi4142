@@ -40,8 +40,9 @@ def getWeatherData(city, entries):
 			if x_size > 0:
 				x.to_csv(WEATHER_DIR+city+'_Chunk'+str(z)+'_weather.csv', encoding='utf-8', index=False)
 				z+=1
-			entries += x_size
+				entries += x_size
 
+#Note that if you are not running for all locations be aware that entries should be set to the highest key previously generated
 entries = 0
 #getWeatherData('Toronto', entries)
 getWeatherData('Ottawa', entries)

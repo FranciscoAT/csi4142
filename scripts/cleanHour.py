@@ -23,7 +23,7 @@ def allHours():
 		filename = "hourly"+str(dy.year)+".csv"
 		writer = csv.DictWriter(open(f"{CLEAN_DIR}/{filename}",'w'), fieldnames=field_names)
 		writer.writeheader()
-		for dt in rrule.rrule(rrule.HOURLY, dtstart=datetime.datetime(year, 1, 1), until=datetime.datetime(year,12,31)):
+		for dt in rrule.rrule(rrule.HOURLY, dtstart=datetime.datetime(year, 1, 1), until=datetime.datetime(year,12,31,23)):
 			new_row={}
 			new_row["HOUR_KEY"]=hour_iterID
 			hour_iterID=hour_iterID+1
