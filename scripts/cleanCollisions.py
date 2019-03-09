@@ -13,6 +13,7 @@ SOURCE_DIR = f"{DATA_DIR}/source/collision"
 CLEAN_DIR = f"{DATA_DIR}/cleaned/accident-dim"
 NEIGHBORHOODS = f"{DATA_DIR}/cleaned/neighborhood/neighborhood_list.json"
 STATIONS = f"{DATA_DIR}/cleaned/stations/Ottawa_Stations.csv"
+HOUR_DIR = f"{DATA_DIR}/cleaned/hour"
 
 
 def main() -> None:
@@ -85,9 +86,13 @@ def clean_file(filename, accident_index, location_index, locations, is_2017, hoo
         "INTERSECTION_RAMP_1",
         "INTERSECTION_RAMP_2",
         "NEIGHBORHOOD",
-        "CLOSEST_STATION"
+        "CLOSEST_STATION",
+        "HOUR_KEY"
     ]
 
+    year = filename[16:-4]
+    
+    hour_dict = get_hour_dict(year)
     reader = csv.DictReader(open(f"{SOURCE_DIR}/{filename}"))
     writer = csv.DictWriter(open(f"{CLEAN_DIR}/{filename}", 'w'), fieldnames=field_names)
     writer.writeheader()
@@ -128,7 +133,8 @@ def clean_file(filename, accident_index, location_index, locations, is_2017, hoo
             new_row[key] = parse_out_id(new_row[key])
 
         # Clean up location
-        is_intersection, road_highway_name, intersection_ramp_1, intersection_ramp_2 = parse_location(new_row["LOCATION"])
+        is_intersection, road_highway_name, intersection_ramp_1, intersection_ramp_2 = parse_location(
+            new_row["LOCATION"])
         # parse_location(new_row["LOCATION"])
         new_row["IS_INTERSECTION"] = is_intersection
         new_row["ROAD_HIGHWAY"] = road_highway_name
@@ -144,6 +150,9 @@ def clean_file(filename, accident_index, location_index, locations, is_2017, hoo
 
         # Remove some keys
         new_row.pop("COLLISION_CLASSIFICATION")
+
+        # Hour ID
+        new_row["HOUR_KEY"] = hour_dict[f"{new_row['ACCIDENT_TIME']}/{new_row['DATE']}"]
 
         # Write row to file
         writer.writerow(new_row)
@@ -170,9 +179,9 @@ def distance(x, y):
 
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon2)
-    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
-        * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    a = math.sin(dlat / 2) * math.sin(dlat / 2) + math.cos(math.radians(lat1)) \
+        * math.cos(math.radians(lat2)) * math.sin(dlon / 2) * math.sin(dlon / 2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     d = radius * c
 
     return d
@@ -283,6 +292,21 @@ def get_stations():
         }
 
     return station_dict
+
+
+def get_hour_dict(year):
+    reader = csv.DictReader(open(f"{HOUR_DIR}/hourly{year}.csv", 'r'))
+    hour_dict = {}
+    
+    last_key = -1
+    for row in reader:
+        new_key = f"{row['HOUR_START'][:5]}/{row['DATE']}"
+        hour_dict[new_key] = row["HOUR_KEY"]
+        last_key = row["HOUR_KEY"]
+    hour_dict[f'00:00/{int(year)+1}-01-01'] = int(last_key) + 1
+    
+    return hour_dict
+
 
 if __name__ == "__main__":
     main()
