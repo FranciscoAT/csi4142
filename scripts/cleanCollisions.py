@@ -12,6 +12,7 @@ DATA_DIR = './data'
 SOURCE_DIR = f"{DATA_DIR}/source/collision"
 CLEAN_DIR = f"{DATA_DIR}/cleaned/accident-dim"
 NEIGHBORHOODS = f"{DATA_DIR}/cleaned/neighborhood/neighborhood_list.json"
+STATIONS = f"{DATA_DIR}/cleaned/stations/Ottawa_Stations.csv"
 
 
 def main() -> None:
@@ -28,6 +29,7 @@ def main() -> None:
 def clean_ottawa_collisions():
     print("Cleaning Ottawa Collisions")
     hood_json = json.load(open(NEIGHBORHOODS, 'r'))
+    stations_dict = get_stations()
 
     csv_files_raw = os.listdir(SOURCE_DIR)
     csv_files = []
@@ -47,10 +49,10 @@ def clean_ottawa_collisions():
 
         print(f"Cleaning {csv_file}...")
         accident_index, location_index, locations = clean_file(
-            csv_file, accident_index, location_index, locations, is_2017, hood_json)
+            csv_file, accident_index, location_index, locations, is_2017, hood_json, stations_dict)
 
 
-def clean_file(filename, accident_index, location_index, locations, is_2017, hood_json):
+def clean_file(filename, accident_index, location_index, locations, is_2017, hood_json, stations_dict):
     core_field_names = [
         "LOCATION",
         "LONGITUDE",
@@ -82,7 +84,8 @@ def clean_file(filename, accident_index, location_index, locations, is_2017, hoo
         "ROAD_HIGHWAY",
         "INTERSECTION_RAMP_1",
         "INTERSECTION_RAMP_2",
-        "NEIGHBORHOOD"
+        "NEIGHBORHOOD",
+        "CLOSEST_STATION"
     ]
 
     reader = csv.DictReader(open(f"{SOURCE_DIR}/{filename}"))
@@ -134,7 +137,10 @@ def clean_file(filename, accident_index, location_index, locations, is_2017, hoo
         new_row.pop("LOCATION")
 
         # Get Neighborhood
-        new_row["NEIGHBORHOOD"] = getNeighborhood(new_row["LATITUDE"], new_row["LONGITUDE"], hood_json)
+        new_row["NEIGHBORHOOD"] = get_closest(new_row["LATITUDE"], new_row["LONGITUDE"], hood_json)
+
+        # Closest Station
+        new_row["CLOSEST_STATION"] = get_closest(new_row["LATITUDE"], new_row["LONGITUDE"], stations_dict)
 
         # Remove some keys
         new_row.pop("COLLISION_CLASSIFICATION")
@@ -145,11 +151,11 @@ def clean_file(filename, accident_index, location_index, locations, is_2017, hoo
     return accident_index, location_index, locations
 
 
-def getNeighborhood(lat, long, hood_json):
+def get_closest(lat, long, dict_in):
     closest = ''
     closest_val = 1000000
 
-    for key, value in hood_json.items():
+    for key, value in dict_in.items():
         dist = distance((float(lat), float(long)), (value['lat'], value['lng']))
         if dist < closest_val:
             closest_val = dist
@@ -265,6 +271,18 @@ def get_elements(row, field_names):
 
     return new_row
 
+
+def get_stations():
+    reader = csv.DictReader(open(STATIONS, 'r'))
+
+    station_dict = {}
+    for row in reader:
+        station_dict[row["Name"]] = {
+            'lat': float(row["Latitude (Decimal Degrees)"]),
+            'lng': float(row["Longitude (Decimal Degrees)"])
+        }
+
+    return station_dict
 
 if __name__ == "__main__":
     main()

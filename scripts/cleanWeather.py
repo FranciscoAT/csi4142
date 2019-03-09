@@ -33,16 +33,15 @@ def getWeatherData(city, entries):
 			x_size = x.size
 			indexes = list(range(entries, x_size+entries))
 
-			df = df.reset_index(drop=True)
+			x = x.reset_index(drop=True)
 		#	df.columns[0] = 'New_ID'
-			df['weatherID'] = df.index + entries
-			df.set_index('weatherID')
-			print(df['weatherID'])
+			x['weatherID'] = x.index + entries
+			
 			if x_size > 0:
 				x.to_csv(WEATHER_DIR+city+'_Chunk'+str(z)+'_weather.csv', encoding='utf-8', index=False)
 				z+=1
 			entries += x_size
 
 entries = 0
-getWeatherData('Toronto', entries)
+#getWeatherData('Toronto', entries)
 getWeatherData('Ottawa', entries)

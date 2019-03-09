@@ -5,7 +5,7 @@ import json
 CREATETABLES = [
 	"""
 	CREATE TABLE hour (
-		hour_key SERIAL PRIMARY KEY,
+		hour_key INT PRIMARY KEY,
 		hour_start TIME,
 		hour_end TIME,
 		currDate DATE,
@@ -19,7 +19,7 @@ CREATETABLES = [
 	""",
 	"""
 	CREATE TABLE accident (
-		accident_key SERIAL PRIMARY KEY,
+		accident_key INT PRIMARY KEY,
 		accident_time TIME,
 		environment VARCHAR,
 		road_surface VARCHAR,
@@ -29,7 +29,7 @@ CREATETABLES = [
 	""",
 	"""
 	CREATE TABLE weather(
-		weather_key SERIAL PRIMARY KEY,
+		weather_key INT PRIMARY KEY,
 		station_name VARCHAR,
 		longitude INT,
 		latitude INT,
@@ -43,14 +43,14 @@ CREATETABLES = [
 	""",
 	"""
 	CREATE TABLE event(
-		event_key SERIAL PRIMARY KEY,
+		event_key INT PRIMARY KEY,
 		event_name VARCHAR,
 		event_start_date DATE,
 		event_end_date DATE)
 	""",
 	"""
 	CREATE TABLE location(
-		location_key SERIAL PRIMARY KEY,
+		location_key INT PRIMARY KEY,
 		streetName_highway VARCHAR,
 		intersection1_offramp1 VARCHAR,
 		intersection2_offramp2 VARCHAR,
@@ -83,6 +83,13 @@ def create():
 	try:
 		conn = psycopg2.connect(host=creds["host"],database=creds["database"], user=creds["user"], password=creds["password"])
 		cursor = conn.cursor()
+		cursor.execute("DROP TABLE accidentFact;")
+		cursor.execute("DROP TABLE accident;")
+		cursor.execute("DROP TABLE hour;")
+		cursor.execute("DROP TABLE location;")
+		cursor.execute("DROP TABLE weather;")
+		cursor.execute("DROP TABLE event;")
+		
 		for table in CREATETABLES:
 			cursor.execute(table)
 		cursor.close()
