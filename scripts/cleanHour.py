@@ -10,7 +10,7 @@ import holidays
 from datetime import date
 
 STARTDATE = datetime.datetime(2013, 1, 1)
-ENDDATE = datetime.datetime(2018, 12, 31)
+ENDDATE = datetime.datetime(2019, 1, 1)
 hundredDaysLater = STARTDATE + timedelta(days=100)
 CLEAN_DIR = "../data/cleaned/hour"
 holidays = holidays.Canada()
@@ -28,7 +28,7 @@ def allHours():
 			new_row["HOUR_KEY"]=hour_iterID
 			hour_iterID=hour_iterID+1
 			new_row["HOUR_START"]=dt.strftime("%X")
-			p1hour=(dt+timedelta(hours=1)).strftime("%X")
+			p1hour=(dt+timedelta(hours=1)-timedelta(seconds=1)).strftime("%X")
 			new_row["HOUR_END"]=p1hour
 			new_row["DATE"]=dt.strftime("%Y-%m-%d")
 			new_row["DAY_OF_WEEK"]=dt.strftime("%A")

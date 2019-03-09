@@ -16,7 +16,7 @@ CREATETABLES = [
 		holiday VARCHAR,
 		holiday_name VARCHAR
 		)
-	""",
+	 """,
 	"""
 	CREATE TABLE accident (
 		accident_key INT PRIMARY KEY,

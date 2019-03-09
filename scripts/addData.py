@@ -115,4 +115,30 @@ def add_weather_data():
 		if conn is not None:
 			conn.close()
 
+def add_location_data():
+	with open("creds.json", 'r') as f:
+		creds = json.load(f)
+	conn = None
+	try:
+		conn = psycopg2.connect(host=creds["host"],database=creds["database"], user=creds["user"], password=creds["password"])
+		cursor = conn.cursor()
+		for file in collision_files:
+			with open(file) as csv_file:
+				csv_reader = csv.reader(csv_file, delimiter=',')
+				rowNum = 0
+				for row in csv_reader:
+					if rowNum != 0:
+						location_INSERT = """INSERT INTO location(location_key,streetName_highway,intersection1_offramp1,intersection2_offramp2,longitude,latitude,neighborhood) """\
+						"""VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+						cursor.execute(location_INSERT,(row[7],row[14],row[15],row[16],row[9],row[10],row[6],))
+					rowNum = rowNum+1
+		cursor.close()
+		conn.commit()
+		print("THE ENDDDDDD!!!!!!")
+	except(Exception, psycopg2.DatabaseError) as error:
+		print(error)
+	finally:
+		if conn is not None:
+			conn.close()
+
 
