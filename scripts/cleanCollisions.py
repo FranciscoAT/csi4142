@@ -12,7 +12,7 @@ DATA_DIR = './data'
 SOURCE_DIR = f"{DATA_DIR}/source/collision"
 CLEAN_DIR = f"{DATA_DIR}/cleaned/accident-dim"
 NEIGHBORHOODS = f"{DATA_DIR}/cleaned/neighborhood/neighborhood_list.json"
-STATIONS = f"{DATA_DIR}/cleaned/stations/Ottawa_Stations.csv"
+STATIONS = f"{DATA_DIR}/cleaned/stations/cleaned_ottawa_stations.csv"
 HOUR_DIR = f"{DATA_DIR}/cleaned/hour"
 
 
@@ -286,9 +286,9 @@ def get_stations():
 
     station_dict = {}
     for row in reader:
-        station_dict[row["Name"]] = {
-            'lat': float(row["Latitude (Decimal Degrees)"]),
-            'lng': float(row["Longitude (Decimal Degrees)"])
+        station_dict[row["NAME"]] = {
+            'lat': float(row["LAT"]),
+            'lng': float(row["LNG"])
         }
 
     return station_dict
