@@ -3,14 +3,13 @@ import os
 import psycopg2
 import json
 
-collision_files = ['../data/cleaned/accident-dim/collisionsOttawa2017.csv']
+collision_files = ['../data/cleaned/accident-dim/collisionsOttawa2013.csv']
  				# 	'../data/cleaned/accident-dim/collisionsOttawa2014.csv',
  				# 	"../data/cleaned/accident-dim/collisionsOttawa2015.csv",
  				# 	"../data/cleaned/accident-dim/collisionsOttawa2016.csv",
 					# "../data/cleaned/accident-dim/collisionsOttawa2017.csv"] 
 
 weather_files = ['../data/cleaned/hour/hourly2018.csv']
-
 
 def add_collision_data():
 	with open("creds.json", 'r') as f:
@@ -64,7 +63,6 @@ def add_hour_data():
 		if conn is not None:
 			conn.close()
 
-add_hour_data()
 
 def add_location_data():
 	with open("creds.json", 'r') as f:
@@ -81,7 +79,7 @@ def add_location_data():
 					if rowNum != 0:
 						location_INSERT = """INSERT INTO location(location_key,streetName_highway,intersection1_offramp1,intersection2_offramp2,longitude,latitude,neighborhood) """\
 						"""VALUES (%s, %s, %s, %s, %s, %s, %s)"""
-						cursor.execute(location_INSERT,(row[7],row[14],row[15],row[16],row[9],row[10],row[6],))
+						cursor.execute(location_INSERT,(row[7],row[13],row[14],row[15],row[8],row[9],row[16],))
 					rowNum = rowNum+1
 		cursor.close()
 		conn.commit()
@@ -91,6 +89,8 @@ def add_location_data():
 	finally:
 		if conn is not None:
 			conn.close()
+
+add_location_data()
 					
 def add_weather_data():
 	with open("creds.json", 'r') as f:
