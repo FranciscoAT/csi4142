@@ -78,7 +78,8 @@ def add_location_data():
 				for row in csv_reader:
 					if rowNum != 0:
 						location_INSERT = """INSERT INTO location(location_key,streetName_highway,intersection1_offramp1,intersection2_offramp2,longitude,latitude,neighborhood) """\
-						"""VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+						"""VALUES (%s, %s, %s, %s, %s, %s, %s)"""\
+						"""ON DUPLICATE UPDATE location_key=location_key"""
 						cursor.execute(location_INSERT,(row[7],row[13],row[14],row[15],row[8],row[9],row[16],))
 					rowNum = rowNum+1
 		cursor.close()
