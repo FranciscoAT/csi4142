@@ -9,7 +9,7 @@ collision_files = ['../data/cleaned/accident-dim/collisionsOttawa2017.csv']
  				# 	"../data/cleaned/accident-dim/collisionsOttawa2016.csv",
 					# "../data/cleaned/accident-dim/collisionsOttawa2017.csv"] 
 
-weather_files = ['../data/cleaned/hour/hourly2013.csv']
+weather_files = ['../data/cleaned/hour/hourly2018.csv']
 
 
 def add_collision_data():
